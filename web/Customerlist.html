@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户信息管理</title>
+    <!-- 要是用layui, 需要引入 1个js  和 1 css  因为你我路径不一样, 别抄袭我的,,copy 你自己的啊 -->
+    <script src="js/layui-v2.5.6/layui/layui.js"></script>
+    <link rel="stylesheet" href="js/layui-v2.5.6/layui/css/layui.css">
+    <style>
+        #dd{
+            width: 2000px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+<!--我是拜访-->
+<script type="text/html" id="baiFangHtml">
+    <form class="layui-form  layui-form-pane" action="" onsubmit="return false" lay-filter="baiFangHtmlForm" >
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">客户名字</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cust_name"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">拜访时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="visit_time"  class="layui-input" id="visit_time">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">拜访情况</label>
+            <div class="layui-input-block">
+                <textarea  placeholder="请输入内容"  name="visit_desc"  class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+
+        <!--id 隐藏起来-->
+        <input class="layui-input" type="hidden" value="" name="user_id">
+        <input class="layui-input" type="hidden" value="" name="id">
+        <!--下面应该有 提交 或者 返回按钮- 隐藏起来 -->
+        <button class="layui-btn layui-hide" lay-submit lay-filter="myBaiFangSubmit" id="myBaiFangSubmit">立即提交</button>
+    </form>
+
+</script>
+
+
+<!--我是增加-->
+<script type="text/html" id="addHtml">
+    <form class="layui-form  layui-form-pane" action="" onsubmit="return false" lay-filter="myUpdate" >
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">顾客名字</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cust_name"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">顾客公司名字</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cust_company"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">顾客工作</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cust_position"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">顾客联系方式</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cust_phone"  class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">顾客生日</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cust_birth"  class="layui-input" id="cust_birth">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">顾客性别</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="cust_sex" value="1" title="男" checked="">
+                <input type="radio" name="cust_sex" value="2" title="女">
+                <!--<input type="radio" name="sex" value="禁" title="禁用" disabled="">-->
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">顾客的描述</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" class="layui-textarea" name="cust_desc"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">拜访人</label>
+            <div class="layui-input-inline">
+                <select name="user_id" lay-filter="user_id" id="user_id">
+                    <option value="" selected="">请选择</option>
+                    <!--<option value="1">从后台查询</option>-->
+                    <!--<option value="2" >查询非管理员</option>-->
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">创建日期</label>
+            <div class="layui-input-inline">
+                <input type="text" name="create_time" class="layui-input" id="create_time" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+
+
+        <!--下面应该有 提交 或者 返回按钮- 隐藏起来 -->
+        <button class="layui-btn layui-hide" lay-submit lay-filter="myAddSubmit" id="myAddSubmit">立即提交</button>
+    </form>
+
+</script>
+
+<!--加上一个搜索框-->
+<form class="layui-form  layui-form-pane" action="" onsubmit="return false">
+    <div id="dd">
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="cname"  class="layui-input">
+        </div>
+
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-inline">
+            <input type="text" name="phoneNumber"  class="layui-input">
+        </div>
+
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-inline">
+            <select name="sex">
+                <option value="" selected="">请选择</option>
+                <option value="1">男</option>
+                <option value="2">女</option>
+            </select>
+        </div>
+
+        <label class="layui-form-label" >拜访人</label>
+        <div class="layui-input-inline">
+            <input type="text" name="uname"  class="layui-input">
+        </div>
+
+            <label class="layui-form-label">最近拜访时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="lookTime" class="layui-input" id="updateTime" placeholder="yyyy-MM-dd HH:mm:ss">
+            </div>
+
+        <div class="layui-input-inline">
+            <button type="submit" class="layui-btn" lay-submit="" lay-filter="searchBtn">搜索</button>
+        </div>
+    </div>
+    </div>
+</form>
+
+
+<!-- 数据表格如何用呢? 第一步,拷贝一个 html  table 标记 -->
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+        <button class="layui-btn layui-btn-sm" lay-event="addObj">添加</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delAll">批量删除</button>
+
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn  layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn  layui-btn-xs"  lay-event="lookCustomer">拜访记录</a>
+</script>
+
+<script>
+    layui.use(['form', 'table', 'util', 'jquery','laydate'], function (args) {
+        var form = layui.form;
+        var table = layui.table;
+        var util = layui.util;
+        var $ = layui.jquery;
+        var laydate = layui.laydate;
+        var layer = layui.layer;
+
+
+        //日期时间选择器
+        laydate.render({
+            elem: '#updateTime'
+            , type: 'datetime'
+        });
+
+
+        // table.render 是渲染 上面的 table 表格
+        table.render({
+            elem: '#test'
+            // , url: '/test/table/demo1.json'
+            , url: '/CustomerSelectServlet'
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '用户数据表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+
+                // , {
+                //     field: 'email', title: '邮箱', width: 150, edit: 'text', templet: function (res) {
+                //         return '<em>' + res.email + '</em>'
+                //     }
+                // }
+                , {field: 'id', title: '序号', width: 80, edit: 'text', sort: true}
+                , {field: 'cust_name', title: '顾客姓名', width: 160}
+                , {field: 'cust_phone', title: '顾客手机号', width: 160}
+                , {field: 'cust_position', title: '顾客的工作', width: 160}
+                , {
+                    field: 'cust_sex', title: '顾客的性别', width: 160, templet: function (d) {
+                        //管理员1 变红
+                        var cust_sex = d.cust_sex;
+                        if (cust_sex == 1) {
+                            return "<span style='color:red'>男</span>"
+                        } else {
+                            return "<span style='color:green'>女</span>"
+                        }
+                    }
+                }
+                // , {
+                //     field: 'is_del', title: '是否能用', width: 160, templet: function (d) {
+                //         if (d.is_del == 1) {
+                //             return "  <input type=\"checkbox\" checked=\"\" name=\"open\" lay-skin=\"switch\" lay-filter=\"switchTest\" lay-text=\"是|否\"   value='1' >"
+                //         } else {
+                //             return "  <input type=\"checkbox\"name=\"close\" lay-skin=\"switch\" lay-filter=\"switchTest\"  lay-text=\"是|否\"  value='2' >"
+                //         }
+                //     }
+                // }
+                , {
+                    field: 'username', title: '拜访人', width: 160
+                }
+                , {
+                    field: 'user_id', title: '业务员id', width: 100 ,hide:true
+                }
+                , {field: 'create_time', title: '第一次拜访时间', width: 160}
+                , {field: 'modify_time', title: '最后一次拜访时间', width: 160}
+
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150}
+
+            ]]
+            , page: true
+            //     ,parseData: function(res){ //res 即为原始返回的数据
+            //         return {
+            //             "code": res.number, //解析接口状态
+            //             "msg": res.message, //解析提示文本
+            //             "count": res.object.count111, //解析数据长度
+            //             "data": res.object.data111 //解析数据列表
+            //         };
+            //     }
+            //     ,response: {
+            //         statusName: 'code' //规定数据状态的字段名称，默认：code
+            //         ,statusCode: 20001 //规定成功的状态码，默认：0
+            //         ,msgName: 'msg' //规定状态信息的字段名称，默认：msg
+            //         ,countName: 'count' //规定数据总数的字段名称，默认：count
+            //         ,dataName: 'data' //规定数据列表的字段名称，默认：data
+            //     }
+        });
+
+
+        //头工具栏事件
+        table.on('toolbar(test)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'getCheckData':
+                    var data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：' + data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    break;
+                case 'addObj':
+
+                    layer.open({
+                        title:'编辑',
+                        area: ['600px', '800px'],
+                        type: 1,
+                        //  content: '<h1>你好世界..</h1>' // 一般不吧html写在这里
+                        content: $("#addHtml").html() ,
+                        success:function (layero, index) {
+                            //常规用法
+                            laydate.render({
+                                elem: '#create_time'
+                            });
+                            form.render();  // 重点:强调: 当界面发生改变时, 记得 重新渲染模块,不然不显示效果
+
+                            //日期时间选择器s
+                            laydate.render({
+                                elem: '#cust_birth'
+                            });
+                           //发送ajax 得到数据后渲染到 select 框中
+                            //异步 刷新 layui 的下拉框
+                            $.ajax({
+                                url:'/SelectAllByServiceServlet',
+                                type:'get',
+                                dataType:'json',
+                                success:function (res) {
+                                    console.log(res)
+                                    var select=$("#user_id")
+                                    $.each(res.data,function (index,item) {
+                                        select.append(new Option(item.real_name,item.id));  //在下拉菜单里添加元素
+                                    });
+                                    layui.form.render("select");
+                                }
+                            });
+
+
+                        },
+
+                        btn:['确定添加','取消添加','其他'],
+                        yes:function (index, layero) {
+                            // alert("向后台发送了ajax")
+                            $("#myAddSubmit").click();
+                            return false;  //开启该代码可禁止点击该按钮关闭
+                        },
+                        btn2:function (index, layero) {
+                            alert("我取消了修改")
+                            return false;  //开启该代码可禁止点击该按钮关闭
+                        }
+                    });
+
+                    layer.msg("这里写添加");
+                    break;
+                case 'delAll':
+                    var data = checkStatus.data;  //选中的数据
+                    //data 是一个数组  就要遍历
+                    var ids=new Array();
+
+                    $.each(data,function (index,item) {
+                        console.log(item.id);  //获取一行数据的id
+                        ids.push( item.id);
+                    })
+                    console.log(ids);
+                    if(ids.length<=0){
+                        layer.msg("请选中删除一行",{icon:5})
+                    }else{
+                        //使用ajax 把数组传入到 后台
+                        layer.confirm('小宝贝，你确定要删掉我吗？', {icon:3, title:"确定删除吗"},function (index) {
+                            console.log("发送ajax 做批量删除");
+                            $.ajax({
+                                url:'/DelAllCustomerServlet',
+                                type:'post',
+                                data:{"ids":ids},
+                                dataType:'json',
+                                success:function (res) {
+                                    console.log(res)
+                                    if(res.code==0){
+                                        layer.msg("删除成功",{icon:2});
+                                        table.reload('test', {
+                                            page:{
+                                                curr:1//重新从第1页开始
+                                            }
+                                        }); //只重再数据
+                                    }
+                                }
+                            });
+                            layer.close(index);
+                        });
+                    }
+                    break;
+
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+            }
+            ;
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'edit') {
+                layer.open({
+                    title: '编辑',
+                    area: ['600px', '600px'],
+                    type: 1,
+                    //  content: '<h1>你好世界..</h1>' // 一般不吧html写在这里
+                    content: $("#updateHtml").html(),
+                    success: function (layero, index) {
+                        console.log(layero)
+                        console.log(index)
+                        console.log(" 我是 layer 弹出成功后的回调")
+                        console.log(data)
+
+                        //给表单赋值
+                        form.val("myUpdate", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                            "username": data.username // "name": "value"
+                            , "real_name": data.real_name
+                            , "password": data.password
+                            , "type": data.type
+                            , "is_del": data.is_del
+                            , "modify_time": data.modify_time
+                            , "id": data.id
+                        });
+
+                        form.render();  // 重点:强调: 当界面发生改变时, 记得 重新渲染模块,不然不显示效果
+                        //日期时间选择器
+                        laydate.render({
+                            elem: '#updateTime'
+                            , type: 'datetime'
+                        });
+
+                    },
+                    btn: ['确定修改', '取消修改', '其他'],
+                    yes: function (index, layero) {
+                        // alert("向后台发送了ajax")
+                        $("#myUpdateSubmit").click();
+                        return false;  //开启该代码可禁止点击该按钮关闭
+                    },
+                    btn2: function (index, layero) {
+                        alert("我取消了修改")
+                        return false;  //开启该代码可禁止点击该按钮关闭
+                    }
+                });
+
+            }else  if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                    $.ajax({
+                        url:'/DelByIdCustomerServlet',
+                        type:'post',
+                        data:{"id":data.id},
+                        dataType:'json',
+                        success:function (res) {
+                            console.log(res)
+                            if(res.code==0){
+                                layer.msg("删除成功",{icon:2});
+                                table.reload('test', {
+                                    page:{
+                                        curr:1//重新从第1页开始
+                                    }
+                                }); //只重再数据
+                            }
+                        }
+                    });
+
+                });
+
+
+            }else if ( obj.event === 'lookCustomer'){
+               // alert("嘿嘿嘿 拜访记录")
+
+                layer.open({
+                    title: '拜访记录',
+                    area: ['600px', '600px'],
+                    type: 1,
+                    //  content: '<h1>你好世界..</h1>' // 一般不吧html写在这里
+                    content: $("#baiFangHtml").html(),
+                    success: function (layero, index) {
+                        console.log("将来是要 复制到表单中的名字")
+                        console.log(data.user_id)
+                        console.log(data.id)
+                        console.log(data.cust_name)
+
+                        form.val('baiFangHtmlForm',{
+                            "user_id":data.user_id,
+                            "cust_id":data.cust_id,
+                            "id":data.id,
+                            "cust_name":data.cust_name
+                        });
+
+                        form.render();  // 重点:强调: 当界面发生改变时, 记得 重新渲染模块,不然不显示效果
+                        //日期时间选择器
+                        laydate.render({
+                            elem: '#visit_time'
+                        });
+                    },
+                    btn: ['确定拜访', '取消拜访'],
+                    yes: function (index, layero) {
+                        // alert("向后台发送了ajax")
+                        $("#myBaiFangSubmit").click();
+                            return false;  //开启该代码可禁止点击该按钮关闭
+                    },
+                    btn2: function (index, layero) {
+                       // return false;  //开启该代码可禁止点击该按钮关闭
+                    }
+                });
+            }
+        });
+
+        //监听搜索按钮
+        form.on('submit(searchBtn)',function (data) {
+            //alert('监听搜索')
+            console.log(data.field);
+            table.reload('test',{
+            where:{//设定异步数据接口的额外参数，任意设
+                cname:data.field.cname
+                    ,lookTime:data.field.lookTime
+                    ,phoneNumber:data.field.phoneNumber
+                    ,sex:data.field.sex
+                    ,uname:data.field.uname
+            }
+        ,page:{
+                curr:1//重新从第1页开始
+            }
+        });//只重再数据
+            return false;
+        })
+
+        //监听添加的按钮
+        form.on('submit(myAddSubmit)',function (data) {
+            console.log(data);
+            $.ajax({
+                url:"/InsertCustomerServlet",
+                type:'post',
+                data:data.field,
+                dataType:'JSON',
+                success:function (res) {
+                    console.log(res)
+                    if(res.code==0){
+                        layer.msg("添加成功")
+                        table.reload('test',{
+                            page:{
+                                curr:1//重新从第1页开始
+                            }
+                        });//只重载数据
+                    }
+                }
+            });
+
+        })
+
+
+        //监听拜访记录的按钮
+        form.on('submit(myBaiFangSubmit)',function (data) {
+            console.log(data);
+            $.ajax({
+                url:"/VisitBaiFangServlet",
+                type:'post',
+                data:data.field,
+                dataType:'JSON',
+                success:function (res) {
+                    console.log(res)
+                    if(res.code==0){
+                        layer.msg("添加拜访成功")
+                        table.reload('test',{
+                            page:{
+                                curr:1//重新从第1页开始
+                            }
+                        });//只重载数据
+                    }
+                }
+            });
+
+        })
+
+    });
+
+</script>
+    </body>
+</html>
